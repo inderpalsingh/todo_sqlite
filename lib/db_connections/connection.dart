@@ -9,6 +9,14 @@ class DbAppConnection {
 
   /// accessing the connection class object and create db class object
   static final DbAppConnection db = DbAppConnection._();
+  
+  
+  
+  /// creating global static values
+  static const String TABLE_NAME = 'todo';
+  static const String TABLE_COLUME_TITLE = 'todo_title';
+  static const String TABLE_COLUME_DESC = 'todo_desc';
+  static const String TABLE_COLUME_ID = 'id';
 
   /// all db logic
 
@@ -32,7 +40,7 @@ class DbAppConnection {
     return await openDatabase( actualPath, version: 1, onCreate: (db, version) async {
 
       /// create table
-      await db.execute('CREATE TABLE todo (id INTEGER PRIMARY KEY AUTOINCREMENT, todo_title TEXT, todo_desc TEXT )');
+      await db.execute('CREATE TABLE $TABLE_NAME ($TABLE_COLUME_ID INTEGER PRIMARY KEY AUTOINCREMENT, $TABLE_COLUME_TITLE TEXT, $TABLE_COLUME_DESC TEXT )');
         
       },
     );
@@ -43,9 +51,9 @@ class DbAppConnection {
   Future addTodo({required String title,required String desc}) async{
     var db = await getDB();
     
-    db.insert('todo', {
-      'todo_title': title,
-      'todo_desc': desc
+    db.insert(TABLE_NAME, {
+      TABLE_COLUME_TITLE: title,
+      TABLE_COLUME_DESC: desc
     });
     
   }
@@ -54,7 +62,7 @@ class DbAppConnection {
   Future<List<Map<String, dynamic>>> fetchAllTodo()async{
     
     var db = await getDB();
-    var data = await db.query('todo');
+    var data = await db.query(TABLE_NAME);
     return data;
     
     

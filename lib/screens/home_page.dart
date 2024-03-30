@@ -8,11 +8,11 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DbAppConnection? db;
-  
+
   TextEditingController titleController = TextEditingController();
   TextEditingController descController = TextEditingController();
-  
-  List<Map<String,dynamic>> todoList = [];
+
+  List<Map<String, dynamic>> todoList = [];
 
   @override
   void initState() {
@@ -20,12 +20,10 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getAllTodoList();
   }
-  
-  void getAllTodoList() async{
+
+  void getAllTodoList() async {
     todoList = await db!.fetchAllTodo();
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   @override
@@ -34,20 +32,22 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Todo Sqlite'),
       ),
-      body: todoList.isEmpty ? const Center(child: Text('No List')) : ListView.builder(
-        itemCount: todoList.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(todoList[index]['todo_title']),
-            subtitle: Text(todoList[index]['todo_title']),
-          );
-        },
-      ),
+      body: todoList.isEmpty
+          ? const Center(child: Text('No List'))
+          : ListView.builder(
+              itemCount: todoList.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(todoList[index][DbAppConnection.TABLE_COLUME_TITLE]),
+                  subtitle: Text(todoList[index][DbAppConnection.TABLE_COLUME_DESC]),
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           titleController.clear();
           descController.clear();
-          
+
           showModalBottomSheet(
             context: context,
             builder: (context) {
@@ -55,44 +55,47 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.all(20.0),
                 child: Column(
                   children: [
-                    const Text('Add Todo', style: TextStyle(fontSize: 15),),
+                    const Text(
+                      'Add Todo',
+                      style: TextStyle(fontSize: 15),
+                    ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: titleController,
                       decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'Enter task'
-                      ),
+                          border: OutlineInputBorder(), hintText: 'Enter task'),
                     ),
                     const SizedBox(height: 20),
                     TextField(
                       controller: descController,
                       decoration: const InputDecoration(
-                          border: OutlineInputBorder(),
-                          hintText: 'Enter desc'
-                      ),
+                          border: OutlineInputBorder(), hintText: 'Enter desc'),
                     ),
                     const SizedBox(height: 30),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton(onPressed: (){
-                          if(titleController.text.isNotEmpty && descController.text.isNotEmpty){
-                            db!.addTodo(title: titleController.text.trim(), desc: descController.text.trim());
-                            
-                          }
+                        ElevatedButton(
+                            onPressed: () {
+                              if (titleController.text.isNotEmpty &&  descController.text.isNotEmpty) {
+                                db!.addTodo(
+                                    title: titleController.text,
+                                    desc: descController.text,
+                                );
+                              }
 
-                          Navigator.pop(context);
-                          setState(() {
-                             getAllTodoList();
-                          });
-                        }, child: const Text('Save')),
-                        ElevatedButton(onPressed: (){
-                          Navigator.pop(context);
-                          setState(() {
-                            
-                          });
-                        }, child: const Text('Cancel')),
+                              Navigator.pop(context);
+                              setState(() {
+                                getAllTodoList();
+                              });
+                            },
+                            child: const Text('Save')),
+                        ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              setState(() {});
+                            },
+                            child: const Text('Cancel')),
                       ],
                     )
                   ],
