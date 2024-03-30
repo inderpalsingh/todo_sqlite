@@ -8,34 +8,99 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   DbAppConnection? db;
-
   
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descController = TextEditingController();
+  
+  List<Map<String,dynamic>> todoList = [];
+
   @override
   void initState() {
-    var db = DbAppConnection.db; // accessing the database class object
+    db = DbAppConnection.db; // accessing the database class object
     super.initState();
+    getAllTodoList();
   }
   
-  
+  void getAllTodoList() async{
+    todoList = await db!.fetchAllTodo();
+    setState(() {
+      
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    
-    
-    
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Todo Sqlite'),
       ),
-      body: ListView.builder(
-        itemCount: 10,
+      body: todoList.isEmpty ? const Center(child: Text('No List')) : ListView.builder(
+        itemCount: todoList.length,
         itemBuilder: (context, index) {
-          return ListView();
+          return ListTile(
+            title: Text(todoList[index]['todo_title']),
+            subtitle: Text(todoList[index]['todo_title']),
+          );
         },
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          db!.addTodo();
+          titleController.clear();
+          descController.clear();
+          
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Column(
+                  children: [
+                    const Text('Add Todo', style: TextStyle(fontSize: 15),),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: titleController,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'Enter task'
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      controller: descController,
+                      decoration: const InputDecoration(
+                          border: OutlineInputBorder(),
+                          hintText: 'Enter desc'
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton(onPressed: (){
+                          if(titleController.text.isNotEmpty && descController.text.isNotEmpty){
+                            db!.addTodo(title: titleController.text.trim(), desc: descController.text.trim());
+                            
+                          }
+
+                          Navigator.pop(context);
+                          setState(() {
+                             getAllTodoList();
+                          });
+                        }, child: const Text('Save')),
+                        ElevatedButton(onPressed: (){
+                          Navigator.pop(context);
+                          setState(() {
+                            
+                          });
+                        }, child: const Text('Cancel')),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
+          );
+          // db!.addTodo();
         },
         child: const Icon(Icons.add),
       ),

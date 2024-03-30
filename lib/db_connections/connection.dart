@@ -40,7 +40,7 @@ class DbAppConnection {
   
 
   /// insert data
-  Future addTodo(String title, String desc) async{
+  Future addTodo({required String title,required String desc}) async{
     var db = await getDB();
     
     db.insert('todo', {
