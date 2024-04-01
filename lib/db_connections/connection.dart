@@ -40,7 +40,8 @@ class DbAppConnection {
     return await openDatabase( actualPath, version: 1, onCreate: (db, version) async {
 
       /// create table
-      await db.execute('CREATE TABLE $TABLE_NAME ($TABLE_COLUME_ID INTEGER PRIMARY KEY AUTOINCREMENT, $TABLE_COLUME_TITLE TEXT, $TABLE_COLUME_DESC TEXT )');
+      await db.execute(
+          'CREATE TABLE $TABLE_NAME ($TABLE_COLUME_ID INTEGER PRIMARY KEY AUTOINCREMENT, $TABLE_COLUME_TITLE TEXT, $TABLE_COLUME_DESC TEXT )');
         
       },
     );
@@ -64,8 +65,12 @@ class DbAppConnection {
     var db = await getDB();
     var data = await db.query(TABLE_NAME);
     return data;
+  }
+  
+  
+  void deleteTodo(int id) async{
+    var db = await getDB();
+    db.delete(TABLE_NAME, where: TABLE_COLUME_ID);
     
-    
-
   }
 }
